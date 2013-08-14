@@ -123,8 +123,8 @@ class PermissionRequiredMixin(AccessMixin):
         # view, or raise a configuration error.
         if self.permission_required is None:
             raise ImproperlyConfigured(
-                "'PermissionRequiredMixin' requires "
-                "'permission_required' attribute to be set.")
+                '{0} requires the "permission_required" attribute to '
+                'be set.'.format(self.__class__.name__))
 
         # Check to see if the request's user has the required permission.
         has_permission = request.user.has_perm(self.permission_required)
@@ -224,8 +224,8 @@ class MultiplePermissionsRequiredMixin(AccessMixin):
         """
         if self.permissions is None or not isinstance(self.permissions, dict):
             raise ImproperlyConfigured(
-                "'PermissionsRequiredMixin' requires "
-                "'permissions' attribute to be set to a dict.")
+                '{0} requires the "permissions" attribute to be a '
+                'dict.'.format(self.__class__.__name__))
 
     def _check_permissions_keys_set(self, perms_all=None, perms_any=None):
         """
@@ -235,9 +235,9 @@ class MultiplePermissionsRequiredMixin(AccessMixin):
         """
         if perms_all is None and perms_any is None:
             raise ImproperlyConfigured(
-                "'PermissionsRequiredMixin' requires"
-                "'permissions' attribute to be set to a dict and the 'any' "
-                "or 'all' key to be set.")
+                '{0} requires the "permissions" attribute to be a '
+                'dict and the "any" or "all" key to be set.'.format(
+                    self.__class__.__name__))
 
     def _check_perms_keys(self, key=None, perms=None):
         """
@@ -249,6 +249,9 @@ class MultiplePermissionsRequiredMixin(AccessMixin):
                 "'MultiplePermissionsRequiredMixin' "
                 "requires permissions dict '%s' value to be a list "
                 "or tuple." % key)
+            raise ImproperlyConfigured(
+                '{0} requires the "permissions" dict "{1}" value to be'
+                'a list or tuple.'.format(self.__class__.__name__, key))
 
 
 class GroupRequiredMixin(AccessMixin):
@@ -261,9 +264,9 @@ class GroupRequiredMixin(AccessMixin):
         ):
 
             raise ImproperlyConfigured(
-                "'GroupRequiredMixin' requires "
-                "'group_required' attribute to be set and be one of the "
-                "following types: string, unicode, list, or tuple.")
+                '{0} requires "group_required" attribute to be set and be'
+                'one of the following types: string, unicode, '
+                'list or tuple.'.format(self.__class__.__name__))
         return self.group_required
 
     def check_membership(self, group):
@@ -316,11 +319,10 @@ class SuccessURLRedirectListMixin(object):
         # Return the reversed success url.
         if self.success_list_url is None:
             raise ImproperlyConfigured(
-                "%(cls)s is missing a succes_list_url "
-                "name to reverse and redirect to. Define "
-                "%(cls)s.success_list_url or override "
-                "%(cls)s.get_success_url()"
-                "." % {"cls": self.__class__.__name__})
+                '{0} is missing a succes_list_url '
+                'name to reverse and redirect to. Define '
+                '{0}.success_list_url or override '
+                '{0}.get_success_url().'.format(self.__class__.__name__))
         return reverse(self.success_list_url)
 
 
@@ -359,10 +361,9 @@ class SetHeadlineMixin(object):
                                    # attribute and this method wasn't
                                    # overridden raise a configuration error.
             raise ImproperlyConfigured(
-                "%(cls)s is missing a headline. "
-                "Define %(cls)s.headline, or override "
-                "%(cls)s.get_headline()." % {"cls": self.__class__.__name__}
-            )
+                '{0} is missing a headline. '
+                'Define {0}.headline, or override '
+                '{0}.get_headline().'.format(self.__class__.__name__))
         return self.headline
 
 
@@ -377,16 +378,16 @@ class SelectRelatedMixin(object):
         if self.select_related is None:  # If no fields were provided,
                                          # raise a configuration error
             raise ImproperlyConfigured(
-                "%(cls)s is missing the "
-                "select_related property. This must be a tuple or list." % {
-                    "cls": self.__class__.__name__})
+                '{0} is missing the "select_related" property. '
+                'This must be a tuple or list.'.format(
+                    self.__class__.__name__))
 
         if not isinstance(self.select_related, (tuple, list)):
             # If the select_related argument is *not* a tuple or list,
             # raise a configuration error.
             raise ImproperlyConfigured(
-                "%(cls)s's select_related property "
-                "must be a tuple or list." % {"cls": self.__class__.__name__})
+                "{0}'s select_related property "
+                "must be a tuple or list.".format(self.__class__.__name__))
 
         # Get the current queryset of the view
         queryset = super(SelectRelatedMixin, self).get_queryset()
@@ -405,16 +406,16 @@ class PrefetchRelatedMixin(object):
         if self.prefetch_related is None:  # If no fields were provided,
                                            # raise a configuration error
             raise ImproperlyConfigured(
-                "%(cls)s is missing the "
-                "prefetch_related property. This must be a tuple or list." % {
-                    "cls": self.__class__.__name__})
+                '{0} is missing the "prefetch_related" property. '
+                'This must be a tuple or list.'.format(
+                    self.__class__.__name__))
 
         if not isinstance(self.prefetch_related, (tuple, list)):
             # If the select_related argument is *not* a tuple or list,
             # raise a configuration error.
             raise ImproperlyConfigured(
-                "%(cls)s's prefetch_related property "
-                "must be a tuple or list." % {"cls": self.__class__.__name__})
+                '{0} "prefetch_related" property '
+                'must be a tuple or list.'.format(self.__class__.__name__))
 
         # Get the current queryset of the view
         queryset = super(PrefetchRelatedMixin, self).get_queryset()
