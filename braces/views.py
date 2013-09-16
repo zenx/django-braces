@@ -37,9 +37,9 @@ class AccessMixin(object):
         """
         if self.login_url is None:
             raise ImproperlyConfigured(
-                "%(cls)s is missing the login_url. "
-                "Define %(cls)s.login_url or override "
-                "%(cls)s.get_login_url()." % {"cls": self.__class__.__name__})
+                u'{} is missing the login_url. Define {}.login_url '
+                u'or override {}.get_login_url().'.format(
+                    self.__class__.__name__))
 
         return force_text(self.login_url)
 
@@ -49,10 +49,10 @@ class AccessMixin(object):
         """
         if self.redirect_field_name is None:
             raise ImproperlyConfigured(
-                "%(cls)s is missing the "
-                "redirect_field_name. Define %(cls)s.redirect_field_name or "
-                "override %(cls)s.get_redirect_field_name()." % {
-                "cls": self.__class__.__name__})
+                u'{} is missing the redirect_field_name. '
+                u'Define {}.redirect_field_name or override '
+                u'{}.get_redirect_field_name().'.format(
+                    self.__class__.__name__))
 
         return self.redirect_field_name
 
@@ -123,8 +123,8 @@ class PermissionRequiredMixin(AccessMixin):
         # view, or raise a configuration error.
         if self.permission_required is None:
             raise ImproperlyConfigured(
-                '{0} requires the "permission_required" attribute to '
-                'be set.'.format(self.__class__.name__))
+                u'{} requires the "permission_required" attribute to '
+                u'be set.'.format(self.__class__.name__))
 
         # Check to see if the request's user has the required permission.
         has_permission = request.user.has_perm(self.permission_required)
@@ -224,8 +224,8 @@ class MultiplePermissionsRequiredMixin(AccessMixin):
         """
         if self.permissions is None or not isinstance(self.permissions, dict):
             raise ImproperlyConfigured(
-                '{0} requires the "permissions" attribute to be a '
-                'dict.'.format(self.__class__.__name__))
+                u'{} requires the "permissions" attribute to be a '
+                u'dict.'.format(self.__class__.__name__))
 
     def _check_permissions_keys_set(self, perms_all=None, perms_any=None):
         """
@@ -235,8 +235,8 @@ class MultiplePermissionsRequiredMixin(AccessMixin):
         """
         if perms_all is None and perms_any is None:
             raise ImproperlyConfigured(
-                '{0} requires the "permissions" attribute to be a '
-                'dict and the "any" or "all" key to be set.'.format(
+                u'{} requires the "permissions" attribute to be a '
+                u'dict and the "any" or "all" key to be set.'.format(
                     self.__class__.__name__))
 
     def _check_perms_keys(self, key=None, perms=None):
@@ -246,12 +246,8 @@ class MultiplePermissionsRequiredMixin(AccessMixin):
         """
         if perms and not isinstance(perms, (list, tuple)):
             raise ImproperlyConfigured(
-                "'MultiplePermissionsRequiredMixin' "
-                "requires permissions dict '%s' value to be a list "
-                "or tuple." % key)
-            raise ImproperlyConfigured(
-                '{0} requires the "permissions" dict "{1}" value to be'
-                'a list or tuple.'.format(self.__class__.__name__, key))
+                u'{0} requires the "permissions" dict "{1}" value to be'
+                u'a list or tuple.'.format(self.__class__.__name__, key))
 
 
 class GroupRequiredMixin(AccessMixin):
@@ -264,9 +260,9 @@ class GroupRequiredMixin(AccessMixin):
         ):
 
             raise ImproperlyConfigured(
-                '{0} requires "group_required" attribute to be set and be'
-                'one of the following types: string, unicode, '
-                'list or tuple.'.format(self.__class__.__name__))
+                u'{} requires "group_required" attribute to be set and be'
+                u'one of the following types: string, unicode, '
+                u'list or tuple.'.format(self.__class__.__name__))
         return self.group_required
 
     def check_membership(self, group):
@@ -319,10 +315,10 @@ class SuccessURLRedirectListMixin(object):
         # Return the reversed success url.
         if self.success_list_url is None:
             raise ImproperlyConfigured(
-                '{0} is missing a succes_list_url '
-                'name to reverse and redirect to. Define '
-                '{0}.success_list_url or override '
-                '{0}.get_success_url().'.format(self.__class__.__name__))
+                u'{} is missing a succes_list_url '
+                u'name to reverse and redirect to. Define '
+                u'{}.success_list_url or override '
+                u'{}.get_success_url().'.format(self.__class__.__name__))
         return reverse(self.success_list_url)
 
 
@@ -361,9 +357,9 @@ class SetHeadlineMixin(object):
                                    # attribute and this method wasn't
                                    # overridden raise a configuration error.
             raise ImproperlyConfigured(
-                '{0} is missing a headline. '
-                'Define {0}.headline, or override '
-                '{0}.get_headline().'.format(self.__class__.__name__))
+                u'{} is missing a headline. '
+                u'Define {}.headline, or override '
+                u'{}.get_headline().'.format(self.__class__.__name__))
         return self.headline
 
 
@@ -378,16 +374,16 @@ class SelectRelatedMixin(object):
         if self.select_related is None:  # If no fields were provided,
                                          # raise a configuration error
             raise ImproperlyConfigured(
-                '{0} is missing the "select_related" property. '
-                'This must be a tuple or list.'.format(
+                u'{} is missing the "select_related" property. '
+                u'This must be a tuple or list.'.format(
                     self.__class__.__name__))
 
         if not isinstance(self.select_related, (tuple, list)):
             # If the select_related argument is *not* a tuple or list,
             # raise a configuration error.
             raise ImproperlyConfigured(
-                "{0}'s select_related property "
-                "must be a tuple or list.".format(self.__class__.__name__))
+                u"{}'s select_related property "
+                u"must be a tuple or list.".format(self.__class__.__name__))
 
         # Get the current queryset of the view
         queryset = super(SelectRelatedMixin, self).get_queryset()
@@ -406,16 +402,16 @@ class PrefetchRelatedMixin(object):
         if self.prefetch_related is None:  # If no fields were provided,
                                            # raise a configuration error
             raise ImproperlyConfigured(
-                '{0} is missing the "prefetch_related" property. '
-                'This must be a tuple or list.'.format(
+                u'{} is missing the "prefetch_related" property. '
+                u'This must be a tuple or list.'.format(
                     self.__class__.__name__))
 
         if not isinstance(self.prefetch_related, (tuple, list)):
             # If the select_related argument is *not* a tuple or list,
             # raise a configuration error.
             raise ImproperlyConfigured(
-                '{0} "prefetch_related" property '
-                'must be a tuple or list.'.format(self.__class__.__name__))
+                u'{} "prefetch_related" property '
+                u'must be a tuple or list.'.format(self.__class__.__name__))
 
         # Get the current queryset of the view
         queryset = super(PrefetchRelatedMixin, self).get_queryset()
@@ -451,11 +447,9 @@ class JSONResponseMixin(object):
     def get_content_type(self):
         if self.content_type is None:
             raise ImproperlyConfigured(
-                u"%(cls)s is missing a content type. "
-                u"Define %(cls)s.content_type, or override "
-                u"%(cls)s.get_content_type()." % {
-                u"cls": self.__class__.__name__}
-            )
+                u'{} is missing a content type. Define {}.content_type, '
+                u'or override {}.get_content_type().'.format(
+                    self.__class__.__name__))
         return self.content_type
 
     def get_json_dumps_kwargs(self):
@@ -682,15 +676,15 @@ class FormValidMessageMixin(object):
         """
         if self.form_valid_message is None:
             raise ImproperlyConfigured(
-                '{0}.form_valid_message is not set. Define '
-                '{0}.form_valid_message, or override '
-                '{0}.get_form_valid_message().'.format(self.__class__.__name__)
+                u'{}.form_valid_message is not set. Define '
+                u'{}.form_valid_message, or override '
+                u'{}.get_form_valid_message().'.format(self.__class__.__name__)
             )
 
         if not isinstance(self.form_valid_message, six.string_types):
             raise ImproperlyConfigured(
-                '{0}.form_valid_message must be a str or unicode '
-                'object.'.format(self.__class__.__name__)
+                u'{}.form_valid_message must be a str or unicode '
+                u'object.'.format(self.__class__.__name__)
             )
 
         return self.form_valid_message
@@ -721,17 +715,17 @@ class FormInvalidMessageMixin(object):
         """
         if self.form_invalid_message is None:
             raise ImproperlyConfigured(
-                '{0}.form_invalid_message is not set. Define '
-                '{0}.form_invalid_message, or override '
-                '{0}.get_form_invalid_message().'.format(
+                u'{}.form_invalid_message is not set. Define '
+                u'{}.form_invalid_message, or override '
+                u'{}.get_form_invalid_message().'.format(
                     self.__class__.__name__)
             )
 
         if not isinstance(self.form_invalid_message,
                           (six.string_types, six.text_type)):
             raise ImproperlyConfigured(
-                '{0}.form_invalid_message must be a str or unicode '
-                'object.'.format(self.__class__.__name__)
+                u'{}.form_invalid_message must be a str or unicode '
+                u'object.'.format(self.__class__.__name__)
             )
 
         return self.form_invalid_message
