@@ -26,6 +26,10 @@ While this doesn't look like much, it frees us up from having to manually overlo
         As of version 1.0, the LoginRequiredMixin has been rewritten to behave like the rest of the ``access`` mixins. It now accepts ``login_url``, ``redirect_field_name``
         and ``raise_exception``.
 
+    .. note::
+
+        This should be the left-most mixin of a view, except when combined with :ref:`CsrfExemptMixin` - which in that case should be the left-most mixin.
+
 ::
 
     from django.views.generic import TemplateView
@@ -187,6 +191,25 @@ Custom Group Usage
                 return False
 
 
+.. _UserPassesTestMixin:
+
+UserPassesTestMixin
+------------------
+
+.. versionadded:: dev
+
+Mixin that reimplements the `user_passes_test` decorator. This is helpful for much more complicated cases than checking if user `is_superuser` (for example if their email is from specific a domain).
+
+::
+
+    from braces.views import UserPassesTestMixin
+
+    class SomeUserPassView(UserPassesTestMixin, TemplateView):
+        def test_func(self, user):
+            return (user.is_staff and not user.is_superuser
+                    and user.email.endswith("mydomain.com"))
+
+
 .. _SuperuserRequiredMixin:
 
 SuperuserRequiredMixin
@@ -201,6 +224,54 @@ Another permission-based mixin. This is specifically for requiring a user to be 
 
     class SomeSuperuserView(LoginRequiredMixin, SuperuserRequiredMixin, TemplateView):
         template_name = "path/to/template.html"
+
+
+.. _AnonymousRequiredMixin:
+
+AnonymousRequiredMixin
+----------------------
+
+Mixin that will redirect authenticated users to a different view. The default redirect is to
+Django's `settings.LOGIN_REDIRECT_URL`.
+
+
+Static Examples
+^^^^^^^^^^^^^^^
+
+::
+
+    from braces.views import AnonymousRequiredMixin
+
+
+    class SomeView(AnonymousRequiredMixin, TemplateView):
+        authenticated_redirect_url = "/send/away/"
+
+
+::
+
+    from django.core.urlresolvers import reverse_lazy
+
+    from braces.views import AnonymousRequiredMixin
+
+
+    class SomeLazyView(AnonymousRequiredMixin, TemplateView):
+        authenticated_redirect_url = reverse_lazy('view_url')
+
+
+Dynamic Example
+^^^^^^^^^^^^^^^
+
+::
+
+    from braces.views import AnonymousRequiredMixin
+
+
+    class SomeView(AnonymousRequiredMixin, TemplateView):
+        """ Redirect based on user level """
+        def get_authenticated_redirect_url(self):
+            if self.request.user.is_superuser:
+                return '/admin/'
+            return '/somewhere/else/'
 
 
 .. _StaffuserRequiredMixin:

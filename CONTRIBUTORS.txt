@@ -19,6 +19,11 @@ Direct Contributors
 * Ethan Soergel
 * Piotr Kilczuk
 * Rodney Folz
+* Markus Zapke-Gründemann
+* Kamil Gałuszka
+* Danilo Bargen
+* Jon Bolt
+* Kit Sunde
 
 Other Contributors
 ==================
