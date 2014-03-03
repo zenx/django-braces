@@ -354,6 +354,10 @@ class OwnerOrPermissionRequiredMixin(AccessMixin):
 
     def dispatch(self, request, *args, **kwargs):
         # Make sure that we can get the object to check for ownership
+        self.request = request
+        self.args = args
+        self.kwargs = kwargs
+
         if not hasattr(self, 'get_object'):
             raise ImproperlyConfigured("The 'OwnerOrPermissionRequiredMixin '"
                                        "requres the 'get_object' method to "
