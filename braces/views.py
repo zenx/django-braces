@@ -379,7 +379,7 @@ class OwnerOrPermissionRequiredMixin(AccessMixin):
             raise ImproperlyConfigured("'OwnerOrPermissionRequiredMixin' "
                                        "requires 'owner_field_name' "
                                        "attribute to be set.")
-        return user == getattr(obj, self.owner_field_name, None)
+        return user == getattr(obj, self.owner_field_name, False)
 
     def handle_no_permission(self, request):
         if self.raise_exception:  # if an exception was desired

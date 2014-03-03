@@ -1,6 +1,7 @@
 import factory
 
-from django.contrib.auth.models import Group, Permission, User
+from django.contrib.auth.models import (Group, Permission, User,
+                                        AnonymousUser)
 
 from .models import Article
 
@@ -29,7 +30,7 @@ class ArticleFactory(factory.django.DjangoModelFactory):
         set_owner = 'set_owner' in kwargs and kwargs.pop('set_owner')
 
         article = super(ArticleFactory, cls)._prepare(create, **kwargs)
-        if set_owner:
+        if set_owner and not isinstance(owner, AnonymousUser):
             article.owner = owner
         return article
 

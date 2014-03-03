@@ -252,9 +252,10 @@ class OwnerOrPermissionRequiredView(views.OwnerOrPermissionRequiredMixin,
     permission_required = 'auth.add_user'
     owner_field_name = 'owner'
 
-    object_responses = {'owner-ok': (ArticleFactory, {'set_owner': True}),
-                        'owner-none': (ArticleFactory, {}),
-                        }
+    object_responses = {
+        'owner-ok': (ArticleFactory, {'set_owner': True}),
+        'owner-none': (ArticleFactory, {}),
+    }
 
 
 class SuperuserRequiredView(views.SuperuserRequiredMixin, OkView):
