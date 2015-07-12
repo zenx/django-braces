@@ -344,3 +344,15 @@ class RecentLoginRequiredView(views.RecentLoginRequiredMixin, OkView):
     """
     A view for testing RecentLoginRequiredMixin.
     """
+
+
+class RedirectUnauthenticatedUsersView(
+        views.LoginRequiredMixin,
+        views.PermissionRequiredMixin,
+        OkView):
+    """
+    A view for testing redirect_unauthenticated_users with raised exceptions
+    """
+    group_required = 'admin'
+    raise_exception = True
+    redirect_unauthenticated_users = True

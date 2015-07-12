@@ -18,7 +18,8 @@ from .views import (PermissionRequiredView, MultiplePermissionsRequiredView,
                     SuperuserRequiredView, StaffuserRequiredView,
                     LoginRequiredView, GroupRequiredView, UserPassesTestView,
                     UserPassesTestNotImplementedView, AnonymousRequiredView,
-                    SSLRequiredView, RecentLoginRequiredView)
+                    SSLRequiredView, RecentLoginRequiredView,
+                    RedirectUnauthenticatedUsersView)
 
 
 class _TestAccessBasicsMixin(TestViewHelper):
@@ -644,4 +645,22 @@ class TestRecentLoginRequiredMixin(test.TestCase):
         user = UserFactory(last_login=last_login)
         self.client.login(username=user.username, password='asdf1234')
         resp = self.client.get(self.outdated_view_url)
+        assert resp.status_code == 302
+
+
+class TestRedirectUnauthentictedUsersCombination(test.TestCase):
+    """
+    Test for making sure redirect_unauthenticated_users raises an exception
+    """
+    view_class = RedirectUnauthenticatedUsersView
+    view_url = '/redirect_exception/'
+
+    def build_user(self):
+        group = GroupFactory(name='admin')
+        user = UserFactory()
+        user.groups.add(group)
+        return user
+
+    def test_raises_exception(self):
+        resp = self.client.get(self.view_url)
         assert resp.status_code == 302

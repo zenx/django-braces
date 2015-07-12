@@ -110,6 +110,10 @@ urlpatterns = patterns(
     # RecentLoginRequiredMixin tests
     url(r'^recent_login/$', views.RecentLoginRequiredView.as_view()),
     url(r'^outdated_login/$', views.RecentLoginRequiredView.as_view()),
+
+    # RedirectUnauthenticatedUsersView tests
+    url(r'^redirect_exception/$',
+        views.RedirectUnauthenticatedUsersView.as_view()),
 )
 
 
