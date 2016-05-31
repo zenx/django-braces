@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import pytest
 import datetime
@@ -18,7 +18,8 @@ from .views import (PermissionRequiredView, MultiplePermissionsRequiredView,
                     SuperuserRequiredView, StaffuserRequiredView,
                     LoginRequiredView, GroupRequiredView, UserPassesTestView,
                     UserPassesTestNotImplementedView, AnonymousRequiredView,
-                    SSLRequiredView, RecentLoginRequiredView)
+                    SSLRequiredView, RecentLoginRequiredView,
+                    UserPassesTestLoginRequiredView)
 
 
 class _TestAccessBasicsMixin(TestViewHelper):
@@ -57,7 +58,7 @@ class _TestAccessBasicsMixin(TestViewHelper):
         user = self.build_unauthorized_user()
         self.client.login(username=user.username, password='asdf1234')
         resp = self.client.get(self.view_url)
-        self.assertRedirects(resp, u'/accounts/login/?next={0}'.format(
+        self.assertRedirects(resp, '/accounts/login/?next={0}'.format(
             self.view_url))
 
     def test_raise_permission_denied(self):
@@ -148,12 +149,12 @@ class _TestAccessBasicsMixin(TestViewHelper):
         req = self.build_request(user=user, path=self.view_url)
         resp = self.dispatch_view(req, login_url='/login/')
         self.assertEqual(
-            u'/login/?next={0}'.format(self.view_url),
+            '/login/?next={0}'.format(self.view_url),
             resp['Location'])
 
         # Test with reverse_lazy
         resp = self.dispatch_view(req, login_url=reverse_lazy('headline'))
-        self.assertEqual(u'/headline/?next={0}'.format(
+        self.assertEqual('/headline/?next={0}'.format(
             self.view_url), resp['Location'])
 
     def test_custom_redirect_field_name(self):
@@ -163,7 +164,7 @@ class _TestAccessBasicsMixin(TestViewHelper):
         user = self.build_unauthorized_user()
         req = self.build_request(user=user, path=self.view_url)
         resp = self.dispatch_view(req, redirect_field_name='foo')
-        expected_url = u'/accounts/login/?foo={0}'.format(self.view_url)
+        expected_url = '/accounts/login/?foo={0}'.format(self.view_url)
         self.assertEqual(expected_url, resp['Location'])
 
     @override_settings(LOGIN_URL=None)
@@ -195,7 +196,7 @@ class _TestAccessBasicsMixin(TestViewHelper):
         user = self.build_unauthorized_user()
         self.client.login(username=user.username, password='asdf1234')
         resp = self.client.get(self.view_url)
-        self.assertRedirects(resp, u'/auth/login/?next={0}'.format(
+        self.assertRedirects(resp, '/auth/login/?next={0}'.format(
             self.view_url))
 
     def test_redirect_unauthenticated(self):
@@ -244,6 +245,63 @@ class TestLoginRequiredMixin(TestViewHelper, test.TestCase):
             redirect_unauthenticated_users=True)
         assert resp.status_code == 302
         assert resp['Location'] == '/accounts/login/?next=/login_required/'
+
+
+class TestChainedLoginRequiredMixin(TestViewHelper, test.TestCase):
+    """
+    Tests for LoginRequiredMixin combined with another AccessMixin.
+    """
+    view_class = UserPassesTestLoginRequiredView
+    view_url = '/chained_view/'
+
+    def assert_redirect_to_login(self, response):
+        """
+        Check that the response is a redirect to the login view.
+        """
+        assert response.status_code == 302
+        assert response['Location'] == '/accounts/login/?next=/chained_view/'
+
+    def test_anonymous(self):
+        """
+        Check that anonymous users redirect to login by default.
+        """
+        resp = self.dispatch_view(
+            self.build_request(path=self.view_url))
+        self.assert_redirect_to_login(resp)
+
+    def test_anonymous_raises_exception(self):
+        """
+        Check that when anonymous users hit a view that has only
+        raise_exception set, they get a PermissionDenied.
+        """
+        with self.assertRaises(PermissionDenied):
+            self.dispatch_view(
+                self.build_request(path=self.view_url), raise_exception=True)
+
+    def test_authenticated_raises_exception(self):
+        """
+        Check that when authenticated users hit a view that has raise_exception
+        set, they get a PermissionDenied.
+        """
+        user = UserFactory()
+        with self.assertRaises(PermissionDenied):
+            self.dispatch_view(
+                self.build_request(path=self.view_url, user=user),
+                raise_exception=True)
+        with self.assertRaises(PermissionDenied):
+            self.dispatch_view(
+                self.build_request(path=self.view_url, user=user),
+                raise_exception=True, redirect_unauthenticated_users=True)
+
+    def test_anonymous_redirects(self):
+        """
+        Check that anonymous users are redirected to login when raise_exception
+        is overridden by redirect_unauthenticated_users.
+        """
+        resp = self.dispatch_view(
+            self.build_request(path=self.view_url), raise_exception=True,
+            redirect_unauthenticated_users=True)
+        self.assert_redirect_to_login(resp)
 
 
 class TestAnonymousRequiredMixin(TestViewHelper, test.TestCase):
@@ -350,7 +408,7 @@ class TestMultiplePermissionsRequiredMixin(
             user = UserFactory(permissions=permissions)
             self.client.login(username=user.username, password='asdf1234')
             resp = self.client.get(url)
-            self.assertRedirects(resp, u'/accounts/login/?next={0}'.format(
+            self.assertRedirects(resp, '/accounts/login/?next={0}'.format(
                 url))
 
     def test_invalid_permissions(self):
@@ -508,14 +566,14 @@ class TestGroupRequiredMixin(_TestAccessBasicsMixin, test.TestCase):
             view.get_group_required()
 
     def test_with_unicode(self):
-        self.view_class.group_required = u'niño'
-        self.assertEqual(u'niño', self.view_class.group_required)
+        self.view_class.group_required = 'niño'
+        self.assertEqual('niño', self.view_class.group_required)
 
         user = self.build_authorized_user()
         group = user.groups.all()[0]
-        group.name = u'niño'
+        group.name = 'niño'
         group.save()
-        self.assertEqual(u'niño', user.groups.all()[0].name)
+        self.assertEqual('niño', user.groups.all()[0].name)
 
         self.client.login(username=user.username, password='asdf1234')
         resp = self.client.get(self.view_url)
@@ -571,8 +629,21 @@ class TestSSLRequiredMixin(test.TestCase):
     view_class = SSLRequiredView
     view_url = '/sslrequired/'
 
+    @pytest.mark.skipif(DJANGO_VERSION[:2] < (1, 9),
+                        reason='Django 1.9 and above behave differently')
+    def test_ssl_redirection_django_19_up(self):
+        self.view_url = 'https://testserver' + self.view_url
+        self.view_class.raise_exception = False
+        resp = self.client.get(self.view_url)
+        self.assertRedirects(resp, self.view_url, status_code=301)
+        resp = self.client.get(self.view_url, follow=True)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual('https', resp.request.get('wsgi.url_scheme'))
+
     @pytest.mark.skipif(DJANGO_VERSION[:2] < (1, 7),
-                        reason='Djanog 1.6 and below behave this differently')
+                        reason='Django 1.6 and below behave differently')
+    @pytest.mark.skipif(DJANGO_VERSION[:2] > (1, 8),
+                        reason='Django 1.6 and below behave differently')
     def test_ssl_redirection_django_17_up(self):
         self.view_class.raise_exception = False
         resp = self.client.get(self.view_url)
@@ -645,3 +716,9 @@ class TestRecentLoginRequiredMixin(test.TestCase):
         self.client.login(username=user.username, password='asdf1234')
         resp = self.client.get(self.outdated_view_url)
         assert resp.status_code == 302
+        
+    def test_not_logged_in(self):
+        last_login = datetime.datetime.now()
+        user = UserFactory(last_login=last_login)
+        resp = self.client.get(self.recent_view_url)
+        assert resp.status_code != 200

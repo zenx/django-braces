@@ -4,9 +4,26 @@
 Changelog
 =========
 
+* :release:`1.9.0 <2016-5-31>`
+* :bug:`208 major` Fixed errors from combining certain access mixins.
+* :bug:`196 major` Refactor how users without permissions are handled.
+* :bug:`181 major` Fixed redirect loops based on user permissions.
+* :bug:`161 major` Fixed redirect loop for users without proper groups for ``MultipleGroupRequiredMixin`` and ``GroupRequiredMixin``.
+* :support:`209` Fixed link to Django documentation for ``user_passes_test`` decorator.
+* :feature:`203` Use Django's supplied version of ``six`` to remove an external dependency.
+* :support:`202` Fixed typo in ``PermissionsRequiredMixin`` and ``MultiplePermissionsRequiredMixin``.
+* :support:`201` Fixed typo in ``SuccessURLRedirectListMixin``.
+* :support:`192` Added example for ``OrderableListView``.
+* :release:`1.8.1 <2015-7-12>`
+* :bug:`176` Only check time delta for authenticated users in :ref:`RecentLoginRequiredMixin`. 
+* :bug:`-` Changed :ref:`JsonRequestResponseMixin` docs to not use `ugettext_lazy`.
+* :bug:`-` Updated tests to include Python 3.2.
+* :bug:`185` Removed `u` prefixes to allow Python 3.2 support.
+* :support:`-` Added note to docs about Python and Django versions used in tests.
+* :bug:`-` Fix small issue in docs for :ref:JsonResponseMixin. The accepted kwarg for the render_to_response method is status not status_code.
 * :release:`1.8.0 <2015-04-16>`
 * :support:`145` Allow custom exceptions to be raised by all AccessMixins.
-* :feature:`171` New :ref:`SSLRequiredMixin`. Redirect http -> https.
+* :feature:`171` New ``SSLRequiredMixin``. Redirect http -> https.
 * :feature:`138` New :ref:`RecentLoginRequiredMixin` to require user sessions to have a given freshness.
 * :bug:`164 major` Use `resolve_url` to handle `LOGIN_REDIRECT_URL`s in `settings.py` that are just URL names.
 * :bug:`130 major` New attribute on :ref:`JSONResponseMixin` to allow setting a custom JSON encoder class.
@@ -65,13 +82,13 @@ Changelog
 * :support:`-` Fixes to documentation.
 * :support:`-` Tests to cover new additions and changes.
 * :release:`0.2.3 <2013-02-22>`
-* :support:`30` Tests for all mixins (from rafales).
-* :feature:`26` New :ref:`CsrfExemptMixin` for marking views as being CSRF exempt (from jarcoal).
-* :support:`-` Some documentation updates and a spelling error correction (from shabda).
+* :support:`30 backported` Tests for all mixins (from rafales).
+* :feature:`26 backported` New :ref:`CsrfExemptMixin` for marking views as being CSRF exempt (from jarcoal).
+* :support:`- backported` Some documentation updates and a spelling error correction (from shabda).
 * :bug:`-` :ref:`SuccessURLRedirectListMixin` raises ``ImproperlyConfigured`` if no ``success_list_url`` attribute is supplied (from kennethlove).
 * :release:`0.2.2 <2013-01-21>`
 * :bug:`25` Try importing the built-in ``json`` module first, drop back to Django if necessary.
-* :support:`-` Django 1.5 compatibility.
+* :support:`- backported` Django 1.5 compatibility.
 * :release:`0.2.1 <2012-12-10>`
 * :bug:`21 major` Fixed signature of :ref:`UserFormKwargsMixin` ``.get_form_kwargs``
 * :feature:`22` Updated :ref:`JSONResponseMixin` to work with non-ASCII characters and other datatypes (such as datetimes)
