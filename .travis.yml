@@ -1,29 +1,42 @@
 language: python
-services: sqlite
+services:
+  - postgresql
 cache:
   directories:
     - $HOME/.cache/pip
 before_cache:
   - rm -f $HOME/.cache/pip/log/debug.log
+before_script:
+  - psql -c 'create database test_database_travis;' -U postgres
+env:
+  global:
+  - DATABASE_URL='postgres://postgres:@localhost:5432/test_database_travis'
+  - IN_TRAVIS='yes'
 matrix:
     include:
-      - python: 2.7
-        env: TOX_ENV=py27-django111
-      - python: 3.4
-        env: TOX_ENV=py34-django111
-      - python: 3.4
-        env: TOX_ENV=py34-django20
-      - python: 3.5
-        env: TOX_ENV=py35-django111
-      - python: 3.5
-        env: TOX_ENV=py35-django20
+      # - python: 2.7
+      #   env: TOX_ENV=py27-django111
+      # - python: 3.6
+      #   env: TOX_ENV=py36-django111
       - python: 3.6
-        env: TOX_ENV=py36-django111
+        env: TOX_ENV=py36-django22
       - python: 3.6
-        env: TOX_ENV=py36-django20
+        env: TOX_ENV=py36-django30
+      # - python: 3.7
+      #   env: TOX_ENV=py37-django111
+      - python: 3.7
+        env: TOX_ENV=py37-django22
+      - python: 3.7
+        env: TOX_ENV=py37-django30
+      # - python: 3.8
+      #   env: TOX_ENV=py38-django111
+      - python: 3.8
+        env: TOX_ENV=py38-django22
+      - python: 3.8
+        env: TOX_ENV=py38-django30
 
 script: tox -e $TOX_ENV
 
 install:
     - pip install pip setuptools wheel -U
-    - pip install tox
+    - pip install tox tox-travis
